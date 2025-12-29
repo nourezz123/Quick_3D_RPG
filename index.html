@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Legend of SimonDev</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="base.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+French+Canon+SC&display=swap" rel="stylesheet">
+</head>
+<body>
+  <script src="./src/main.js" type="module">
+  </script>
+  <div class="container" id="container">
+    <!-- All Quests Complete Screen -->
+    <div class="ui">
+      <div class="completion-screen" id="completion-screen">
+        <div class="completion-content">
+          <div class="completion-title">🎉 CONGRATULATIONS! 🎉</div>
+          <div class="completion-text">
+            You have completed all quests in Honeywood!<br><br>
+            You are now a legendary hero!<br><br>
+            Feel free to explore the world and hunt monsters at your leisure.<br><br>
+            <span style="font-size: 0.8em; color: #ffaa00;">Press ESC to close this message</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Death Screen -->
+    <div class="ui">
+      <div class="death-screen" id="death-screen">
+        <div class="death-content">
+          <div class="death-title">YOU DIED</div>
+          <div class="death-text">
+            Your journey has come to an end...<br><br>
+            <button class="restart-button" id="restart-button">RESTART GAME</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="quest-journal-layout">
+        <div class="quest-journal" id="quest-journal">
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="quest-ui-layout">
+        <div class="quest-ui" id="quest-ui">
+          <div class="quest-text-title" id="quest-text-title"></div>
+          <div class="quest-text" id="quest-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="icon-ui">
+        <div class="icon-bar" id="icon-bar">
+          <div class="icon-bar-item" id="icon-bar-stats" style="background-image: url('./resources/icons/ui/skills.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-inventory" style="background-image: url('./resources/icons/ui/backpack.png');"></div>
+          <div class="icon-bar-item" id="icon-bar-quests" style="background-image: url('./resources/icons/ui/tied-scroll.png');"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="stats" id="stats">
+        <div class="stats-inner">
+          <div class="stats-title">Statistics</div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Level
+              <div class="stats-tooltiptext">Your current level. Gain experience to level up and become stronger!</div>
+            </div>
+            <div id="stats-strength">0</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Strength
+              <div class="stats-tooltiptext">Your strength stat. This directly affects how much damage you deal with weapons.</div>
+            </div>
+            <div id="stats-wisdomness">0</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Health
+              <div class="stats-tooltiptext">Your current and maximum health points. When current health reaches zero, you die!</div>
+            </div>
+            <div id="stats-benchpress">0</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">XP Needed
+              <div class="stats-tooltiptext">How much more experience you need to reach the next level.</div>
+            </div>
+            <div id="stats-curl">0</div>
+          </div>
+          <div class="stats-row">
+            <div class="stats-tooltip">Total XP
+              <div class="stats-tooltiptext">Your current experience points and the total required for next level.</div>
+            </div>
+            <div id="stats-experience">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="health-ui">
+        <div class="health-bar" id="health-bar"></div>
+      </div>
+    </div>
+    <div class="ui">
+      <div class="inventory" id="inventory">
+        <div class="inventory-inner">
+          <div class="inventory-title">Inventory</div>
+          <div class="inventory-row">
+            <div class="inventory-column">
+              <div class="inventory-item" id="inventory-equip-1" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-2" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-3" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-4" draggable="true"></div>
+            </div>
+            <div class="inventory-character"></div>
+            <div class="inventory-column">
+              <div class="inventory-item" id="inventory-equip-5" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-6" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-7" draggable="true"></div>
+              <div class="inventory-item" id="inventory-equip-8" draggable="true"></div>
+            </div>
+          </div>
+          <div class="inventory-row">
+            <div class="inventory-item" id="inventory-1" draggable="true"></div>
+            <div class="inventory-item" id="inventory-2" draggable="true"></div>
+            <div class="inventory-item" id="inventory-3" draggable="true"></div>
+            <div class="inventory-item" id="inventory-4" draggable="true"></div>
+            <div class="inventory-item" id="inventory-5" draggable="true"></div>
+            <div class="inventory-item" id="inventory-6" draggable="true"></div>
+            <div class="inventory-item" id="inventory-7" draggable="true"></div>
+            <div class="inventory-item" id="inventory-8" draggable="true"></div>
+          </div>
+          <div class="inventory-row">
+            <div class="inventory-item" id="inventory-9" draggable="true"></div>
+            <div class="inventory-item" id="inventory-10" draggable="true"></div>
+            <div class="inventory-item" id="inventory-11" draggable="true"></div>
+            <div class="inventory-item" id="inventory-12" draggable="true"></div>
+            <div class="inventory-item" id="inventory-13" draggable="true"></div>
+            <div class="inventory-item" id="inventory-14" draggable="true"></div>
+            <div class="inventory-item" id="inventory-15" draggable="true"></div>
+            <div class="inventory-item" id="inventory-16" draggable="true"></div>
+          </div>
+          <div class="inventory-row">
+            <div class="inventory-item" id="inventory-17" draggable="true"></div>
+            <div class="inventory-item" id="inventory-18" draggable="true"></div>
+            <div class="inventory-item" id="inventory-19" draggable="true"></div>
+            <div class="inventory-item" id="inventory-20" draggable="true"></div>
+            <div class="inventory-item" id="inventory-21" draggable="true"></div>
+            <div class="inventory-item" id="inventory-22" draggable="true"></div>
+            <div class="inventory-item" id="inventory-23" draggable="true"></div>
+            <div class="inventory-item" id="inventory-24" draggable="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
