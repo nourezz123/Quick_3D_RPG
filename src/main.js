@@ -1,8 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118.1/build/three.module.js';
 
-// import {third_person_camera} from './third-person-camera.js';
-// import {first_person_camera} from './first-person-camera.js';
-// import {third_person_camera_mouse} from './third-person-camera-mouse.js';
 import {camera_manager} from './camera-manager.js';
 import {entity_manager} from './entity-manager.js';
 import {player_entity} from './player-entity.js'
@@ -23,6 +20,7 @@ import {equip_weapon_component} from './equip-weapon-component.js';
 import {attack_controller} from './attacker-controller.js';
 import {day_night_cycle} from './day-night-cycle.js';
 import {town_loader} from './town-loader.js';
+import {sitting_component} from './sitting-component.js';
 
 
 const _VS = `
@@ -103,7 +101,7 @@ class HackNSlashDemo {
     this._sun = light;
 
     const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(5000, 5000, 10, 10),
+        new THREE.PlaneGeometry(2000, 2000, 10, 10),
         new THREE.MeshStandardMaterial({
             color: 0x1e601c,
           }));
@@ -132,7 +130,6 @@ class HackNSlashDemo {
     ui.AddComponent(new ui_controller.UIController());
     this._entityManager.Add(ui, 'ui');
 
-    // Add Quest Manager
     const questManager = new entity.Entity();
     questManager.AddComponent(new quest_component.QuestManager());
     this._entityManager.Add(questManager, 'quest-manager');
@@ -145,7 +142,6 @@ class HackNSlashDemo {
       grid: this._grid
     });
     
-    // Place town at coordinates (200, 0, 200)
     loader.LoadTown(new THREE.Vector3(200, 0, 200));
   }
 
@@ -177,7 +173,6 @@ class HackNSlashDemo {
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
     
-    // Add day/night cycle
     const dayNight = new entity.Entity();
     dayNight.AddComponent(new day_night_cycle.DayNightCycle({
       sun: this._sun,
@@ -192,9 +187,9 @@ class HackNSlashDemo {
     for (let i = 0; i < 20; ++i) {
       const index = math.rand_int(1, 3);
     const pos = new THREE.Vector3(
-        (Math.random() * 2.0 - 1.0) * 500,
+        (Math.random() * 2.0 - 1.0) * 400,
         100,
-        (Math.random() * 2.0 - 1.0) * 500);
+        (Math.random() * 2.0 - 1.0) * 400);
 
       const e = new entity.Entity();
       e.AddComponent(new gltf_component.StaticModelComponent({
@@ -223,9 +218,9 @@ class HackNSlashDemo {
       const index = math.rand_int(1, 5);
 
       const pos = new THREE.Vector3(
-          (Math.random() * 2.0 - 1.0) * 500,
+          (Math.random() * 2.0 - 1.0) * 400,
           0,
-          (Math.random() * 2.0 - 1.0) * 500);
+          (Math.random() * 2.0 - 1.0) * 400);
 
       const e = new entity.Entity();
       e.AddComponent(new gltf_component.StaticModelComponent({
@@ -263,7 +258,7 @@ class HackNSlashDemo {
     axe.AddComponent(new inventory_controller.InventoryItem({
         type: 'weapon',
         damage: 4,
-        attackSpeed: 0.9, // Slower attack
+        attackSpeed: 0.9,
         renderParams: {
           name: 'Axe',
           scale: 0.25,
@@ -276,7 +271,7 @@ class HackNSlashDemo {
     sword.AddComponent(new inventory_controller.InventoryItem({
         type: 'weapon',
         damage: 2,
-        attackSpeed: 0.5, // Faster attack
+        attackSpeed: 0.35,
         renderParams: {
           name: 'Sword',
           scale: 0.25,
@@ -285,7 +280,6 @@ class HackNSlashDemo {
     }));
     this._entityManager.Add(sword);
 
-    // Girl NPC with first quest
     const girl = new entity.Entity();
     girl.AddComponent(new gltf_component.AnimatedModelComponent({
         scene: this._scene,
@@ -304,7 +298,6 @@ class HackNSlashDemo {
     girl.SetPosition(new THREE.Vector3(30, 0, 0));
     this._entityManager.Add(girl);
 
-    // Add second NPC for second quest
     const merchant = new entity.Entity();
     merchant.AddComponent(new gltf_component.AnimatedModelComponent({
         scene: this._scene,
@@ -323,7 +316,6 @@ class HackNSlashDemo {
     merchant.SetPosition(new THREE.Vector3(-30, 0, 0));
     this._entityManager.Add(merchant);
 
-    // Add third NPC for third quest
     const elder = new entity.Entity();
     elder.AddComponent(new gltf_component.AnimatedModelComponent({
         scene: this._scene,
@@ -362,6 +354,9 @@ class HackNSlashDemo {
     player.AddComponent(
         new spatial_grid_controller.SpatialGridController({grid: this._grid}));
     player.AddComponent(new attack_controller.AttackController({timing: 0.7, baseSpeed: 0.7}));
+    player.AddComponent(new sitting_component.SittingController({
+        scene: this._scene,
+    }));
     this._entityManager.Add(player, 'player');
 
     player.Broadcast({
@@ -418,41 +413,35 @@ class HackNSlashDemo {
       ];
       const m = monsters[math.rand_int(0, monsters.length - 1)];
 
-      // More varied enemy levels with better distribution
-      // 40% level 1, 30% level 2, 20% level 3, 8% level 4, 2% level 5 (boss-like)
       const rand = Math.random();
       let enemyLevel = 1;
       if (rand > 0.98) {
-        enemyLevel = 5; // 2% - Elite enemies
+        enemyLevel = 5;
       } else if (rand > 0.90) {
-        enemyLevel = 4; // 8% - Very hard enemies
+        enemyLevel = 4;
       } else if (rand > 0.70) {
-        enemyLevel = 3; // 20% - Hard enemies
+        enemyLevel = 3;
       } else if (rand > 0.40) {
-        enemyLevel = 2; // 30% - Medium enemies
+        enemyLevel = 2;
       }
-      // else level 1 (40% - Easy enemies)
 
-      // Scale health and stats by level
-      const baseHealth = 200; // 2 sword hits (100 damage each)
+      const baseHealth = 200;
       const health = baseHealth * enemyLevel;
       const maxHealth = health;
 
-      // Generate position, ensuring it's not too close to spawn point or NPCs
       let spawnPos;
       let attempts = 0;
       const maxAttempts = 50;
       
       do {
         spawnPos = new THREE.Vector3(
-          (Math.random() * 2 - 1) * 500,
+          (Math.random() * 2 - 1) * 400,
           0,
-          (Math.random() * 2 - 1) * 500
+          (Math.random() * 2 - 1) * 400
         );
         attempts++;
       } while (this._IsInSafeZone(spawnPos) && attempts < maxAttempts);
       
-      // If we couldn't find a spot after max attempts, skip this enemy
       if (attempts >= maxAttempts) {
         continue;
       }
@@ -490,13 +479,12 @@ class HackNSlashDemo {
   }
 
   _IsInSafeZone(position) {
-    // Define safe zones around player spawn and quest NPCs
     const safeZones = [
-      { x: 0, z: 0, radius: 80 },      // Player spawn area
-      { x: 30, z: 0, radius: 50 },     // Girl NPC area
-      { x: -30, z: 0, radius: 50 },    // Merchant NPC area
-      { x: 0, z: 30, radius: 50 },     // Elder NPC area
-      { x: 200, z: 200, radius: 100 }, // Town/Village area
+      { x: 0, z: 0, radius: 80 },
+      { x: 30, z: 0, radius: 50 },
+      { x: -30, z: 0, radius: 50 },
+      { x: 0, z: 30, radius: 50 },
+      { x: 200, z: 200, radius: 100 },
     ];
     
     for (let zone of safeZones) {

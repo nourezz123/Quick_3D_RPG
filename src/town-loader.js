@@ -3,6 +3,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118.1/build/three.m
 import {entity} from './entity.js';
 import {gltf_component} from './gltf-component.js';
 import {spatial_grid_controller} from './spatial-grid-controller.js';
+import {player_input} from './player-input.js';
 
 
 export const town_loader = (() => {
@@ -111,6 +112,16 @@ export const town_loader = (() => {
           rotation: -Math.PI / 4,
           scale: 0.07
         },
+
+        // ===== SINGLE CHAIR - RIGHT IN FRONT OF BELL TOWER =====
+        {
+          name: 'Chair_1.fbx',
+          position: new THREE.Vector3(center.x, 0, center.z + 20), // Directly in front
+          rotation: Math.PI, // Facing the bell tower
+          scale: 0.035,
+          isInteractive: true,
+          type: 'chair'
+        },
       ];
 
       // Load each building
@@ -135,14 +146,22 @@ export const town_loader = (() => {
         new spatial_grid_controller.SpatialGridController({grid: this._grid})
       );
       
-      // Add collision marker for building
-      building._isBuilding = true;
-      building._collisionRadius = 15; // Buildings have 15 unit collision radius
+      // Mark interactive objects (chairs)
+      if (buildingData.isInteractive) {
+        building.AddComponent(new player_input.PickableComponent());
+        building._isInteractive = true;
+        building._interactionType = buildingData.type;
+        building._collisionRadius = 3; // Smaller collision for chairs
+      } else {
+        // Regular buildings have larger collision
+        building._isBuilding = true;
+        building._collisionRadius = 15;
+      }
 
       building.SetPosition(buildingData.position);
       
       // Apply rotation if specified
-      if (buildingData.rotation) {
+      if (buildingData.rotation !== undefined) {
         const quaternion = new THREE.Quaternion();
         quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), buildingData.rotation);
         building.SetQuaternion(quaternion);

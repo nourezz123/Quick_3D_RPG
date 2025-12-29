@@ -33,7 +33,9 @@ export const player_input = (() => {
         inventory: false,
         quests: false,
         stats: false,
+        interact: false,
       };
+      this._isSitting = false;
       this._raycaster = new THREE.Raycaster();
       document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
       document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
@@ -139,6 +141,12 @@ export const player_input = (() => {
             }
           }
           break;
+        case 69: // E key - Interact
+          if (!this._keys.interact) {
+            this._keys.interact = true;
+            this._CheckInteraction();
+          }
+          break;
       }
     }
   
@@ -174,6 +182,53 @@ export const player_input = (() => {
         case 70: // F
           this._keys.stats = false;
           break;
+        case 69: // E
+          this._keys.interact = false;
+          break;
+      }
+    }
+
+    _CheckInteraction() {
+      // Don't interact while sitting
+      const sittingController = this._parent.GetComponent('SittingController');
+      if (sittingController && sittingController._isSitting) {
+        // If already sitting, toggle to stand up
+        this._parent.Broadcast({
+          topic: 'sit.toggle',
+          chair: null
+        });
+        return;
+      }
+
+      // Find nearby interactive objects (chairs)
+      const player = this._parent;
+      const grid = player.GetComponent('SpatialGridController');
+      
+      if (!grid) return;
+      
+      const nearby = grid.FindNearbyEntities(5);
+
+      // Find the closest chair
+      let closestChair = null;
+      let closestDistance = Infinity;
+
+      for (let item of nearby) {
+        const entity = item.entity;
+        if (entity._isInteractive && entity._interactionType === 'chair') {
+          const distance = player._position.distanceTo(entity._position);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestChair = entity;
+          }
+        }
+      }
+
+      // Interact with the closest chair if within range
+      if (closestChair && closestDistance < 5) {
+        this._parent.Broadcast({
+          topic: 'sit.toggle',
+          chair: closestChair
+        });
       }
     }
   };

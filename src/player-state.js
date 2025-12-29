@@ -231,6 +231,58 @@ export const player_state = (() => {
     }
   };
 
+  class SitState extends State {
+  constructor(parent) {
+    super(parent);
+  }
+
+  get Name() {
+    return 'sit';
+  }
+
+  Enter(prevState) {
+    const curAction = this._parent._proxy._animations['sit'].action;
+    
+    if (prevState) {
+      const prevAction = this._parent._proxy._animations[prevState.Name].action;
+
+      curAction.reset();
+      curAction.enabled = true;
+      curAction.time = 0.0;
+      curAction.setEffectiveTimeScale(0); // Freeze at first frame for pose
+      curAction.setEffectiveWeight(1.0);
+      curAction.setLoop(THREE.LoopOnce, 1);
+      curAction.clampWhenFinished = true;
+      curAction.crossFadeFrom(prevAction, 0.3, true);
+      curAction.play();
+      
+      // Jump to the pose immediately
+      setTimeout(() => {
+        if (curAction) {
+          curAction.paused = false;
+          curAction.time = 0;
+          curAction.play();
+          curAction.paused = true;
+        }
+      }, 50);
+    } else {
+      curAction.reset();
+      curAction.setLoop(THREE.LoopOnce, 1);
+      curAction.clampWhenFinished = true;
+      curAction.play();
+      curAction.paused = true;
+    }
+    
+    console.log('Sit pose applied');
+  }
+
+  Exit() {
+  }
+
+  Update(timeElapsed, input) {
+    // Stay in sitting state
+  }
+}
   return {
     State: State,
     AttackState: AttackState,
@@ -238,6 +290,7 @@ export const player_state = (() => {
     WalkState: WalkState,
     RunState: RunState,
     DeathState: DeathState,
+    SitState: SitState,
   };
 
 })();

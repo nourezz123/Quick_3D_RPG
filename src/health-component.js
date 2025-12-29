@@ -9,6 +9,10 @@ export const health_component = (() => {
       this._health = params.health;
       this._maxHealth = params.maxHealth;
       this._params = params;
+      
+      // Initialize death sound
+      this._deathSound = new Audio('./resources/audio/death-sound.mp3');
+      this._deathSound.volume = 0.5;
     }
 
     InitComponent() {
@@ -115,6 +119,9 @@ export const health_component = (() => {
     }
 
     _OnDeath(attacker) {
+      // Play death sound
+      this._PlayDeathSound();
+      
       if (attacker) {
         attacker.Broadcast({
             topic: 'health.add-experience',
@@ -141,6 +148,17 @@ export const health_component = (() => {
       // Show death screen if this is the player
       if (this._params.updateUI) {
         this._ShowDeathScreen();
+      }
+    }
+
+    _PlayDeathSound() {
+      try {
+        this._deathSound.currentTime = 0;
+        this._deathSound.play().catch(err => {
+          console.warn('Could not play death sound:', err);
+        });
+      } catch (error) {
+        console.warn('Error playing death sound:', error);
       }
     }
 

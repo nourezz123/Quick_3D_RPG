@@ -22,6 +22,7 @@ export const player_entity = (() => {
       this._AddState('run', player_state.RunState);
       this._AddState('attack', player_state.AttackState);
       this._AddState('death', player_state.DeathState);
+      this._AddState('sit', player_state.SitState);
     }
   };
   
@@ -116,6 +117,7 @@ export const player_entity = (() => {
         loader.load('Sword And Shield Walk.fbx', (a) => { _OnLoad('walk', a); });
         loader.load('Sword And Shield Slash.fbx', (a) => { _OnLoad('attack', a); });
         loader.load('Sword And Shield Death.fbx', (a) => { _OnLoad('death', a); });
+        loader.load('Male Sitting Pose.fbx', (a) => { _OnLoad('sit', a); });
       });
     }
 
@@ -156,6 +158,15 @@ export const player_entity = (() => {
       }
 
       const input = this.GetComponent('BasicCharacterControllerInput');
+      
+      // Prevent movement while sitting
+      if (input && input._isSitting) {
+        if (this._mixer) {
+          this._mixer.update(timeInSeconds);
+        }
+        return;
+      }
+      
       this._stateMachine.Update(timeInSeconds, input);
 
       if (this._mixer) {
